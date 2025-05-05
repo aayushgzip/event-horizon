@@ -1,0 +1,35 @@
+<%- include('partials/header') %>
+
+<section class="register">
+  <h2>Register for <%= event.title %></h2>
+  
+  <div class="event-summary">
+    <img src="/images/events/<%= event.image %>" alt="<%= event.title %>">
+    <div>
+      <h3><%= event.title %></h3>
+      <p><%= new Date(event.date).toLocaleDateString() %> <%= event.time %></p>
+      <p>Location: <%= event.location %></p>
+      <p><%= event.description %></p>
+      <p class="availability">Limited Spots Available! Only <%= event.capacity - event.registered %> spots remaining.</p>
+    </div>
+  </div>
+  
+  <form action="/events/register" method="POST" >
+    <input type="hidden" name="eventId" value="<%= event._id %>">
+    
+    <div class="form-group">
+      <label for="fullName">Full Name</label>
+      <input type="text" id="fullName" name="fullName" placeholder="Jane Doe" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" placeholder="jane.doe@example.com" required>
+      <small>We'll send your confirmation here.</small>
+    </div>
+    
+    <button type="submit" class="btn">Register Now</button>
+  </form>
+</section>
+
+<%- include('partials/footer') %>

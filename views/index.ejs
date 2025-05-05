@@ -1,0 +1,31 @@
+<%- include('partials/header') %>
+
+<section class="hero">
+  <h1>Event Horizon</h1>
+  <p>Your portal to exciting upcoming events!</p>
+</section>
+
+<section class="events">
+  <h2>Upcoming Events</h2>
+  
+  <div class="events-grid">
+    <% if(events.length > 0) { %>
+      <% events.forEach(event => { %>
+        <div class="event-card">
+          <img src="/images/events/<%= event.image %>" alt="<%= event.title %>">
+          <div class="event-details">
+            <h3><%= event.title %></h3>
+            <p><%= new Date(event.date).toLocaleDateString() %> <%= event.time %></p>
+            <p>Location: <%= event.location %></p>
+            <p>Available: <%= event.capacity - event.registered %> / <%= event.capacity %></p>
+            <a href="/events/<%= event._id %>" class="btn">Register</a>
+          </div>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <p>No upcoming events at the moment.</p>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

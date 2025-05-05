@@ -1,0 +1,46 @@
+<%- include('partials/header') %>
+
+<section class="create-event">
+  <h2>Create New Event</h2>
+  
+  <form action="/create" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="title">Event Title</label>
+      <input type="text" id="title" name="title" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="description">Event Description</label>
+      <textarea id="description" name="description" required></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label for="date">Event Date</label>
+      <input type="date" id="date" name="date" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="time">Event Time</label>
+      <input type="time" id="time" name="time" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="location">Event Location</label>
+      <input type="text" id="location" name="location" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="capacity">Event Capacity</label>
+      <input type="number" id="capacity" name="capacity" min="1" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="image">Event Image</label>
+      <input type="file" id="image" name="image">
+    </div>
+    
+    <button type="submit" class="btn">Create Event</button>
+  </form>
+</section>
+
+<%- include('partials/footer') %>
