@@ -59,7 +59,6 @@ We welcome contributions to enhance the functionality and features of Event Hori
 4. Push to the branch (`git push origin feature/your-feature`).
 5. Create a pull request detailing your changes.
 
-Please ensure your code adheres to the project's coding standards and includes appropriate tests.
 
 ## 📄 License
 
