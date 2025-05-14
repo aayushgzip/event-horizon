@@ -47,7 +47,7 @@ To install and run **Event Horizon** on your local machine:
 
 ## 🌐 Live Demo
 
-Experience the live version of Event Horizon: [[event-horizon-khaki.vercel.app](https://event-horizon-app-s784.onrender.com/)]
+Experience the live version of Event Horizon: [[https://event-horizon-app-s784.onrender.com/](https://event-horizon-app-s784.onrender.com/)]
 
 ## 🤝 Contributing
 
