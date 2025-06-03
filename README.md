@@ -13,7 +13,7 @@
 
 - **Frontend**: HTML, CSS, JavaScript, EJS
 - **Backend**: Node.js with Express
-- **Database**: [Specify your database, e.g., MongoDB, MySQL]
+- **Database**: MongoDB
 
 ## 📦 Installation
 
