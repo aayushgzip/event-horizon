@@ -1,35 +1,128 @@
 <%- include('partials/header') %>
 
-<section class="register">
-  <h2>Register for <%= event.title %></h2>
-  
-  <div class="event-summary">
-    <img src="/images/events/<%= event.image %>" alt="<%= event.title %>">
-    <div>
-      <h3><%= event.title %></h3>
-      <p><%= new Date(event.date).toLocaleDateString() %> <%= event.time %></p>
-      <p>Location: <%= event.location %></p>
-      <p><%= event.description %></p>
-      <p class="availability">Limited Spots Available! Only <%= event.capacity - event.registered %> spots remaining.</p>
+<section class="register fade-in">
+  <div class="container">
+    <h2 class="slide-up">Register for <%= event.title %></h2>
+    
+    <!-- Enhanced Event Summary with better structure -->
+    <div class="event-summary slide-up">
+      <img src="/images/events/<%= event.image %>" alt="<%= event.title %>" loading="lazy">
+      <div>
+        <h3><%= event.title %></h3>
+        <p><strong>📅 Date:</strong> <%= new Date(event.date).toLocaleDateString('en-US', { 
+          weekday: 'long',
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric'
+        }) %></p>
+        <p><strong>🕐 Time:</strong> <%= event.time %></p>
+        <p><strong>📍 Location:</strong> <%= event.location %></p>
+        <p class="mb-2"><%= event.description %></p>
+        
+        <!-- Enhanced availability indicator -->
+        <% const spotsLeft = event.capacity - event.registered %>
+        <% if (spotsLeft > 0) { %>
+          <p class="availability available">
+            <% if (spotsLeft <= 10) { %>
+              ⚡ Hurry! Only <%= spotsLeft %> spots remaining
+            <% } else { %>
+              ✅ <%= spotsLeft %> spots available
+            <% } %>
+          </p>
+        <% } else { %>
+          <p class="availability">
+            ❌ Event is fully booked
+          </p>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Enhanced Registration Form -->
+    <% if (spotsLeft > 0) { %>
+      <div class="slide-up">
+        <form action="/events/register" method="POST" class="fade-in">
+          <input type="hidden" name="eventId" value="<%= event._id %>">
+          
+          <!-- Form Header -->
+          <div class="form-group">
+            <h3 style="margin-bottom: 8px; color: var(--text-color);">Complete Your Registration</h3>
+            <p class="text-secondary" style="margin-bottom: 24px;">Please fill in your details to secure your spot at this event.</p>
+          </div>
+          
+          <div class="form-group">
+            <label for="fullName">Full Name *</label>
+            <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+            <small>This name will appear on your registration confirmation.</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+            <small>We'll send your confirmation and event updates here.</small>
+          </div>
+          
+          <!-- Additional optional fields that enhance the registration -->
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567">
+            <small>Optional - for event updates and reminders.</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="specialRequests">Special Requirements or Dietary Restrictions</label>
+            <textarea id="specialRequests" name="specialRequests" placeholder="Any accessibility needs, dietary restrictions, or special requests..."></textarea>
+            <small>Help us make this event accessible and enjoyable for you.</small>
+          </div>
+          
+          <!-- Terms and conditions -->
+          <div class="form-group">
+            <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
+              <input type="checkbox" id="terms" name="terms" required style="margin-top: 4px; width: auto;">
+              <span style="font-size: 14px; line-height: 1.5;">
+                I agree to the <a href="/terms" target="_blank">terms and conditions</a> and understand that this registration is binding. I will receive event updates via email.
+              </span>
+            </label>
+          </div>
+          
+          <button type="submit" class="btn">
+            <span>🎟️</span>
+            Secure My Spot - Register Now
+          </button>
+        </form>
+      </div>
+    <% } else { %>
+      <!-- Sold out state -->
+      <div class="slide-up">
+        <div class="alert error">
+          <strong>Event Fully Booked</strong> - This event has reached maximum capacity. 
+          <a href="/events" style="color: inherit; text-decoration: underline;">Browse other available events</a>
+        </div>
+        
+        <form action="/events/waitlist" method="POST">
+          <input type="hidden" name="eventId" value="<%= event._id %>">
+          
+          <h3 style="margin-bottom: 16px; color: var(--text-color);">Join the Waitlist</h3>
+          <p class="text-secondary mb-3">Get notified if spots become available or similar events are scheduled.</p>
+          
+          <div class="form-group">
+            <label for="waitlistEmail">Email Address</label>
+            <input type="email" id="waitlistEmail" name="email" placeholder="your.email@example.com" required>
+          </div>
+          
+          <button type="submit" class="btn secondary">
+            Join Waitlist
+          </button>
+        </form>
+      </div>
+    <% } %>
+    
+    <!-- Back to events link -->
+    <div class="text-center mt-3 slide-up">
+      <a href="/" class="btn secondary">
+        ← Back to All Events
+      </a>
     </div>
   </div>
-  
-  <form action="/events/register" method="POST" >
-    <input type="hidden" name="eventId" value="<%= event._id %>">
-    
-    <div class="form-group">
-      <label for="fullName">Full Name</label>
-      <input type="text" id="fullName" name="fullName" placeholder="Jane Doe" required>
-    </div>
-    
-    <div class="form-group">
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" placeholder="jane.doe@example.com" required>
-      <small>We'll send your confirmation here.</small>
-    </div>
-    
-    <button type="submit" class="btn">Register Now</button>
-  </form>
 </section>
 
 <%- include('partials/footer') %>

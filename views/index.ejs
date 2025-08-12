@@ -1,31 +1,326 @@
 <%- include('partials/header') %>
 
-<section class="hero">
-  <h1>Event Horizon</h1>
-  <p>Your portal to exciting upcoming events!</p>
-</section>
-
-<section class="events">
-  <h2>Upcoming Events</h2>
-  
-  <div class="events-grid">
-    <% if(events.length > 0) { %>
-      <% events.forEach(event => { %>
-        <div class="event-card">
-          <img src="/images/events/<%= event.image %>" alt="<%= event.title %>">
-          <div class="event-details">
-            <h3><%= event.title %></h3>
-            <p><%= new Date(event.date).toLocaleDateString() %> <%= event.time %></p>
-            <p>Location: <%= event.location %></p>
-            <p>Available: <%= event.capacity - event.registered %> / <%= event.capacity %></p>
-            <a href="/events/<%= event._id %>" class="btn">Register</a>
-          </div>
-        </div>
-      <% }); %>
-    <% } else { %>
-      <p>No upcoming events at the moment.</p>
-    <% } %>
+<section class="hero fade-in">
+  <div class="container">
+    <h1>Your Portal to Exciting Upcoming Events</h1>
+    <p>Discover amazing events, connect with like-minded people, and create unforgettable memories</p>
+    <div class="hero-actions" style="margin-top: 24px;">
+      <a href="/create" class="btn">Create Event</a>
+      <a href="#events" class="btn secondary">Browse Events</a>
+    </div>
   </div>
 </section>
+
+<section class="events" id="events">
+  <div class="container">
+    <h2 class="slide-up">Upcoming Events</h2>
+    
+    <% if(events.length > 0) { %>
+      <!-- Events Stats -->
+      <div class="events-stats" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; flex-wrap: wrap;">
+        <div class="stat-item" style="text-align: center;">
+          <div style="font-size: 2rem; font-weight: 700; color: var(--accent-color);"><%= events.length %></div>
+          <div style="color: var(--text-secondary); font-size: 14px;">Active Events</div>
+        </div>
+        <div class="stat-item" style="text-align: center;">
+          <div style="font-size: 2rem; font-weight: 700; color: var(--success-color);">
+            <%= events.reduce((total, event) => total + (event.capacity - event.registered), 0) %>
+          </div>
+          <div style="color: var(--text-secondary); font-size: 14px;">Available Spots</div>
+        </div>
+        <div class="stat-item" style="text-align: center;">
+          <div style="font-size: 2rem; font-weight: 700; color: var(--warning-color);">
+            <%= events.reduce((total, event) => total + event.registered, 0) %>
+          </div>
+          <div style="color: var(--text-secondary); font-size: 14px;">People Registered</div>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-controls" style="margin-bottom: 32px; text-align: center;">
+        <div class="filter-buttons" style="display: inline-flex; gap: 8px; background: var(--card-bg); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <button class="filter-btn active" data-filter="all" style="padding: 8px 16px; background: var(--accent-color); color: white; border: none; border-radius: 4px; cursor: pointer; transition: var(--transition-fast);">All Events</button>
+          <button class="filter-btn" data-filter="available" style="padding: 8px 16px; background: transparent; color: var(--text-color); border: none; border-radius: 4px; cursor: pointer; transition: var(--transition-fast);">Available</button>
+          <button class="filter-btn" data-filter="filling-fast" style="padding: 8px 16px; background: transparent; color: var(--text-color); border: none; border-radius: 4px; cursor: pointer; transition: var(--transition-fast);">Filling Fast</button>
+        </div>
+      </div>
+
+      <div class="events-grid">
+        <% events.forEach((event, index) => { 
+          const availableSpots = event.capacity - event.registered;
+          const fillPercentage = (event.registered / event.capacity) * 100;
+          const isFillingFast = fillPercentage > 70;
+          const isFull = availableSpots <= 0;
+        %>
+          <div class="event-card slide-up" 
+               style="animation-delay: <%= index * 0.1 %>s"
+               data-category="<%= isFull ? 'full' : (isFillingFast ? 'filling-fast' : 'available') %>"
+               data-available="<%= availableSpots %>">
+            
+            <!-- Event Status Badge -->
+            <div class="event-status" style="position: absolute; top: 16px; right: 16px; z-index: 2;">
+              <% if (isFull) { %>
+                <span style="background: var(--error-color); color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">FULL</span>
+              <% } else if (isFillingFast) { %>
+                <span style="background: var(--warning-color); color: var(--bg-color); padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">FILLING FAST</span>
+              <% } else if (availableSpots <= 5) { %>
+                <span style="background: var(--accent-color); color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">FEW SPOTS LEFT</span>
+              <% } %>
+            </div>
+
+            <div class="event-image-container" style="position: relative; overflow: hidden;">
+              <img src="/images/events/<%= event.image %>" 
+                   alt="<%= event.title %>"
+                   loading="lazy"
+                   onerror="this.src='/images/placeholder-event.jpg'; this.onerror=null;">
+              
+              <!-- Gradient Overlay -->
+              <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(transparent, rgba(0,0,0,0.6)); pointer-events: none;"></div>
+            </div>
+
+            <div class="event-details">
+              <h3><%= event.title %></h3>
+              
+              <div class="event-meta" style="margin: 12px 0;">
+                <p style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                  <span style="width: 16px; height: 16px; background: var(--accent-color); border-radius: 2px; display: inline-block;"></span>
+                  <%= new Date(event.date).toLocaleDateString('en-US', { 
+                    weekday: 'short', 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                  }) %> at <%= event.time %>
+                </p>
+                <p style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                  <span style="width: 16px; height: 16px; background: var(--text-secondary); border-radius: 2px; display: inline-block;"></span>
+                  <%= event.location %>
+                </p>
+              </div>
+
+              <!-- Capacity Progress Bar -->
+              <div class="capacity-info" style="margin: 16px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-size: 14px; color: var(--text-secondary);">Capacity</span>
+                  <span style="font-size: 14px; font-weight: 600; color: <%= isFull ? 'var(--error-color)' : (isFillingFast ? 'var(--warning-color)' : 'var(--success-color)') %>">
+                    <%= availableSpots %> / <%= event.capacity %> available
+                  </span>
+                </div>
+                <div style="width: 100%; height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden;">
+                  <div style="width: <%= fillPercentage %>%; height: 100%; background: <%= isFull ? 'var(--error-color)' : (isFillingFast ? 'var(--warning-color)' : 'var(--success-color)') %>; transition: width 0.3s ease;"></div>
+                </div>
+              </div>
+
+              <% if (event.description) { %>
+                <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5; margin: 12px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                  <%= event.description %>
+                </p>
+              <% } %>
+
+              <div class="event-actions" style="display: flex; gap: 8px; margin-top: 16px;">
+                <a href="/events/<%= event._id %>" 
+                   class="btn <%= isFull ? 'disabled' : '' %>" 
+                   style="flex: 1; <%= isFull ? 'opacity: 0.5; pointer-events: none;' : '' %>">
+                  <%= isFull ? 'Event Full' : 'Register Now' %>
+                </a>
+                <button class="btn secondary" 
+                        onclick="shareEvent('<%= event._id %>', '<%= event.title %>')"
+                        style="width: 44px; padding: 12px;"
+                        title="Share Event">
+                  📤
+                </button>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+
+    <% } else { %>
+      <!-- Empty State -->
+      <div class="empty-state" style="text-align: center; padding: 80px 20px;">
+        <div style="font-size: 4rem; margin-bottom: 16px; opacity: 0.5;">📅</div>
+        <h3 style="margin-bottom: 12px; color: var(--text-color);">No upcoming events</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
+          There are currently no events scheduled. Be the first to create an exciting event for the community!
+        </p>
+        <a href="/create" class="btn">Create First Event</a>
+      </div>
+    <% } %>
+
+    <!-- Call to Action Section -->
+    <div class="cta-section" style="text-align: center; margin: 80px 0 40px; padding: 40px; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+      <h3 style="margin-bottom: 16px; font-size: 1.5rem;">Ready to Host Your Own Event?</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 24px; max-width: 500px; margin-left: auto; margin-right: auto;">
+        Join our community of event organizers and create memorable experiences for people in your area.
+      </p>
+      <a href="/create" class="btn">Start Creating</a>
+    </div>
+  </div>
+</section>
+
+<!-- Loading Overlay for Dynamic Content -->
+<div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(18, 19, 26, 0.8); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
+  <div style="text-align: center;">
+    <div style="width: 40px; height: 40px; border: 3px solid var(--border-color); border-top: 3px solid var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px;"></div>
+    <p style="color: var(--text-color);">Loading events...</p>
+  </div>
+</div>
+
+<script>
+// Enhanced JavaScript for better UX
+document.addEventListener('DOMContentLoaded', function() {
+  // Filter functionality
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  const eventCards = document.querySelectorAll('.event-card');
+
+  filterButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Update active state
+      filterButtons.forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--text-color)';
+      });
+      
+      this.classList.add('active');
+      this.style.background = 'var(--accent-color)';
+      this.style.color = 'white';
+
+      const filter = this.dataset.filter;
+      
+      eventCards.forEach((card, index) => {
+        const shouldShow = filter === 'all' || 
+                          card.dataset.category === filter ||
+                          (filter === 'available' && parseInt(card.dataset.available) > 0);
+        
+        if (shouldShow) {
+          card.style.display = 'block';
+          card.style.animation = `fadeIn 0.5s ease forwards`;
+          card.style.animationDelay = `${index * 0.05}s`;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+
+  // Add scroll effect to header
+  const header = document.querySelector('header');
+  let lastScrollY = window.scrollY;
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // Add loading states for event registration links
+  document.querySelectorAll('.event-card .btn:not(.secondary)').forEach(btn => {
+    if (!btn.classList.contains('disabled')) {
+      btn.addEventListener('click', function(e) {
+        if (!this.href.includes('#')) {
+          this.style.opacity = '0.7';
+          this.innerHTML = 'Loading...';
+        }
+      });
+    }
+  });
+
+  // Add stagger animation to event cards on load
+  eventCards.forEach((card, index) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+      card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, index * 100);
+  });
+});
+
+// Share event function
+function shareEvent(eventId, eventTitle) {
+  if (navigator.share) {
+    navigator.share({
+      title: eventTitle,
+      text: `Check out this event: ${eventTitle}`,
+      url: `${window.location.origin}/events/${eventId}`
+    }).catch(err => console.log('Error sharing:', err));
+  } else {
+    // Fallback to copying URL
+    const url = `${window.location.origin}/events/${eventId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      // Show temporary notification
+      showNotification('Event link copied to clipboard!');
+    }).catch(err => {
+      console.log('Error copying to clipboard:', err);
+    });
+  }
+}
+
+// Simple notification system
+function showNotification(message, type = 'success') {
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--${type === 'success' ? 'success' : 'error'}-color);
+    color: white;
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    z-index: 1001;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  `;
+  notification.textContent = message;
+  
+  document.body.appendChild(notification);
+  
+  // Slide in
+  setTimeout(() => {
+    notification.style.transform = 'translateX(0)';
+  }, 100);
+  
+  // Slide out and remove
+  setTimeout(() => {
+    notification.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 300);
+  }, 3000);
+}
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .filter-btn:hover:not(.active) {
+    background: var(--accent-light) !important;
+    color: var(--accent-color) !important;
+  }
+`;
+document.head.appendChild(style);
+</script>
 
 <%- include('partials/footer') %>
